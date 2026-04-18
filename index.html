@@ -3,146 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Game Portal</title>
+    <title>Wowzers Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         /* Base Styling */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            text-align: center;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f6f8;
+            color: #2d3436;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        nav {
+            background-color: #ffffff;
+            padding: 15px 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ff4757;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* --- HOMEPAGE GRID STYLES --- */
         #home-view {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #2d3436;
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
         }
 
         .game-card {
-            background: white;
-            border-radius: 15px;
-            padding: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            background: #fff;
+            border-radius: 20px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden; /* Keeps the zooming image inside the rounded borders */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
 
         .game-card:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(255, 71, 87, 0.2);
         }
 
         .game-thumbnail {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1 / 1; /* Forces the perfect square layout */
             object-fit: cover;
-            border-radius: 10px;
+            transition: transform 0.4s ease;
+            display: block;
         }
 
-        .game-card h3 {
-            margin: 10px 0 0 0;
-            font-size: 1.1rem;
+        .game-card:hover .game-thumbnail {
+            transform: scale(1.1); /* Zooms the image slightly on hover */
         }
 
-        /* --- GAME PLAYER STYLES --- */
+        .game-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 40px 15px 15px 15px;
+            color: white;
+            text-align: left;
+        }
+
+        .game-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- GAME PLAYER STYLES (Cinematic Mode) --- */
         #game-view {
             display: none;
-            max-width: 1000px;
-            margin: 0 auto;
+            background-color: #111111; /* Dark background for playing games */
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .player-header {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
         }
 
         .back-btn {
             background-color: #ff4757;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 1rem;
-            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 30px;
             cursor: pointer;
-            margin-bottom: 20px;
-            font-weight: bold;
-            transition: background 0.2s;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .back-btn:hover {
             background-color: #ff6b81;
+            transform: scale(1.05);
+        }
+
+        .game-frame-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
         .game-frame {
             width: 100%;
-            height: 75vh;
+            height: 80vh;
             border: none;
-            border-radius: 15px;
-            background-color: #000;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: block;
+        }
+
+        .player-desc {
+            max-width: 1200px;
+            margin: 20px auto;
+            color: #a4b0be;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
 
+    <nav>
+        <div class="logo">🎮 Wowzers Games</div>
+    </nav>
+
     <div id="home-view">
-        <h1>🎮 Awesome Games</h1>
+        <h2 class="section-title">Trending Now</h2>
         <div class="game-grid" id="grid-container">
             </div>
     </div>
 
     <div id="game-view">
-        <button class="back-btn" onclick="goBackToMenu()">← Back to Games</button>
-        <h2 id="player-title">Loading...</h2>
-        <iframe id="player-frame" class="game-frame" src="" allowfullscreen></iframe>
-        <p id="player-desc"></p>
+        <div class="player-header">
+            <button class="back-btn" onclick="goBackToMenu()">
+                <span>←</span> Back
+            </button>
+            <h2 id="player-title">Loading...</h2>
+        </div>
+        
+        <div class="game-frame-container">
+            <iframe id="player-frame" class="game-frame" src="" allowfullscreen></iframe>
+        </div>
+        
+        <p id="player-desc" class="player-desc"></p>
     </div>
 
     <script>
-        // 1. Put the JSON data directly into this variable!
-        // To add a new game, just copy and paste one of these blocks.
+        // Your database of games
         const allGames = [
             {
                 "GAME_ID": "slither",
                 "GAME_NAME": "Slither.io",
                 "GAME_DESCRIPTION": "Play against other people online! Can you become the longest player of the day?",
                 "EMBED_URL": "https://slither.io/",
-                "IMAGE_URL": "https://via.placeholder.com/1000x500"
+                "IMAGE_URL": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800"
             },
             {
                 "GAME_ID": "krunker",
                 "GAME_NAME": "Krunker",
                 "GAME_DESCRIPTION": "A fast-paced pixelated first-person shooter.",
                 "EMBED_URL": "https://krunker.io/",
-                "IMAGE_URL": "https://via.placeholder.com/400x400"
+                "IMAGE_URL": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800"
+            },
+            {
+                "GAME_ID": "tetris",
+                "GAME_NAME": "Tetris",
+                "GAME_DESCRIPTION": "The classic block stacking puzzle game.",
+                "EMBED_URL": "https://tetris.com/play-tetris",
+                "IMAGE_URL": "https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&q=80&w=800"
             }
         ];
 
-        // 2. Build the grid immediately when the page loads
+        // Build the grid
         function buildGrid() {
             const gridContainer = document.getElementById('grid-container');
-            gridContainer.innerHTML = ''; // Clear it out first
+            gridContainer.innerHTML = '';
 
             allGames.forEach(game => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
                 card.onclick = () => openGame(game.GAME_ID);
 
+                // Replaced the simple layout with a layered app-style layout
                 card.innerHTML = `
                     <img class="game-thumbnail" src="${game.IMAGE_URL}" alt="${game.GAME_NAME}">
-                    <h3>${game.GAME_NAME}</h3>
+                    <div class="game-info">
+                        <h3>${game.GAME_NAME}</h3>
+                    </div>
                 `;
                 
                 gridContainer.appendChild(card);
             });
         }
 
-        // 3. Handle opening a game
+        // Handle opening a game
         function openGame(id) {
             const game = allGames.find(g => g.GAME_ID === id);
             
@@ -153,17 +250,24 @@
 
                 document.getElementById('home-view').style.display = 'none';
                 document.getElementById('game-view').style.display = 'block';
+                
+                // Switch body background color so it looks like a whole different page
+                document.body.style.backgroundColor = '#111111';
+                window.scrollTo(0, 0); // Scroll to top
             }
         }
 
-        // 4. Handle going back to the menu
+        // Handle going back to the menu
         function goBackToMenu() {
-            document.getElementById('player-frame').src = ""; // Stop the game from playing in the background
+            document.getElementById('player-frame').src = ""; 
             document.getElementById('game-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
+            
+            // Reset background color back to light mode
+            document.body.style.backgroundColor = '#f4f6f8';
         }
 
-        // 5. Start everything up!
+        // Start everything up
         buildGrid();
     </script>
 

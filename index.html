@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wowzers Games</title>
-    <link rel="icon" type="image/x-icon" href="W.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Base Styling */
+        /* --- BASE STYLING (DARK MODE DEFAULT) --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,15 +15,22 @@
 
         body {
             font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
             background-color: #f4f6f8;
             color: #2d3436;
         }
 
         /* --- NAVIGATION & CONTROLS --- */
         nav {
-            background-color: #ffffff;
+            background-color: #1e1e1e;
             padding: 15px 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -33,65 +39,96 @@
             z-index: 100;
             flex-wrap: wrap;
             gap: 15px;
+            transition: background-color 0.3s;
         }
 
+        .light-mode nav {
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Logo using W.png */
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
             color: #ff4757;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Tabs */
+        .logo img {
+            height: 35px;
+            width: auto;
+        }
+
+        /* Tabs & Buttons */
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
         .tabs {
             display: flex;
             gap: 10px;
         }
 
-        .tab-btn {
+        .btn {
             background: transparent;
             border: 2px solid transparent;
             padding: 8px 16px;
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             font-weight: 600;
-            color: #636e72;
+            color: #a4b0be;
             cursor: pointer;
             border-radius: 20px;
             transition: all 0.2s ease;
         }
 
-        .tab-btn:hover {
+        .btn:hover {
             color: #ff4757;
         }
 
         .tab-btn.active {
+            background: #2d2d2d;
+            color: #ff4757;
+            border-color: #ff4757;
+        }
+
+        .light-mode .btn { color: #636e72; }
+        .light-mode .tab-btn.active {
             background: #ffeaa7;
             color: #d63031;
             border-color: #fdcb6e;
         }
 
         /* Search Bar */
-        .search-container {
-            display: flex;
-            align-items: center;
-        }
-
         #search-bar {
             padding: 10px 20px;
-            border: 2px solid #dfe6e9;
+            border: 2px solid #333;
+            background-color: #2d2d2d;
+            color: white;
             border-radius: 25px;
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             width: 250px;
             outline: none;
-            transition: border-color 0.2s, width 0.3s;
+            transition: all 0.3s;
         }
 
         #search-bar:focus {
             border-color: #ff4757;
             width: 300px;
+        }
+
+        .light-mode #search-bar {
+            background-color: #fff;
+            color: #333;
+            border-color: #dfe6e9;
         }
 
         /* --- HOMEPAGE GRID STYLES --- */
@@ -107,23 +144,26 @@
             gap: 25px;
         }
 
-        /* Shows when search finds nothing */
         .no-results {
             text-align: center;
             grid-column: 1 / -1;
             font-size: 1.2rem;
-            color: #636e72;
             padding: 40px;
         }
 
         .game-card {
             position: relative;
-            background: #fff;
+            background: #1e1e1e;
             border-radius: 20px;
             cursor: pointer;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
+        }
+
+        .light-mode .game-card {
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
         .game-card:hover {
@@ -157,13 +197,11 @@
         .game-info h3 {
             font-size: 1.2rem;
             font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* The little star icon for popular games */
         .popular-badge {
             color: #fdcb6e;
             font-size: 1.2rem;
@@ -172,9 +210,8 @@
         /* --- GAME PLAYER STYLES --- */
         #game-view {
             display: none;
-            background-color: #111111;
-            min-height: 100vh;
             padding: 20px;
+            min-height: 100vh;
         }
 
         .player-header {
@@ -182,24 +219,33 @@
             margin: 0 auto 20px auto;
             display: flex;
             align-items: center;
-            gap: 20px;
-            color: white;
+            justify-content: space-between;
+            color: inherit;
         }
 
-        .back-btn {
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .action-btn {
             background-color: #ff4757;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
             font-size: 1rem;
             font-family: 'Poppins', sans-serif;
             border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.2s, transform 0.2s;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .back-btn:hover {
+        .action-btn:hover {
             background-color: #ff6b81;
             transform: scale(1.05);
         }
@@ -223,7 +269,6 @@
         .player-desc {
             max-width: 1200px;
             margin: 20px auto;
-            color: #a4b0be;
             line-height: 1.6;
         }
     </style>
@@ -231,43 +276,50 @@
 <body>
 
     <nav>
-        <div class="logo">🎮 Wowzers</div>
-        
-        <div class="tabs">
-            <button class="tab-btn active" onclick="setTab('ALL')" id="tab-ALL">All Games</button>
-            <button class="tab-btn" onclick="setTab('POPULAR')" id="tab-POPULAR">⭐ Popular</button>
+        <div class="logo">
+            <img src="W.png" alt="Logo" onerror="this.style.display='none'"> 
+            Wowzers Games
         </div>
+        
+        <div class="nav-controls">
+            <div class="tabs">
+                <button class="btn tab-btn active" onclick="setTab('ALL')" id="tab-ALL">All Games</button>
+                <button class="btn tab-btn" onclick="setTab('POPULAR')" id="tab-POPULAR">⭐ Popular</button>
+            </div>
 
-        <div class="search-container">
             <input type="text" id="search-bar" placeholder="Search games..." oninput="handleSearch()">
+            
+            <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️</button>
         </div>
     </nav>
 
     <div id="home-view">
-        <div class="game-grid" id="grid-container">
-            </div>
+        <div class="game-grid" id="grid-container"></div>
     </div>
 
     <div id="game-view">
         <div class="player-header">
-            <button class="back-btn" onclick="goBackToMenu()">← Back</button>
-            <h2 id="player-title">Loading...</h2>
+            <div class="header-left">
+                <button class="action-btn" onclick="goBackToMenu()">← Back</button>
+                <h2 id="player-title">Loading...</h2>
+            </div>
+            <button class="action-btn" onclick="openFullscreen()">⛶ Fullscreen</button>
         </div>
+        
         <div class="game-frame-container">
             <iframe id="player-frame" class="game-frame" src="" allowfullscreen></iframe>
         </div>
+        
         <p id="player-desc" class="player-desc"></p>
     </div>
 
     <script>
-        // Data State Variables
-        let currentTab = 'ALL'; // 'ALL' or 'POPULAR'
+        let currentTab = 'ALL'; 
         let searchQuery = '';
 
-        // Added "POPULAR" properties and some number-based games
+        // Removed GAME_ID entirely. The code now uses GAME_NAME to find it.
         const allGames = [
             {
-                "GAME_ID": "slither",
                 "GAME_NAME": "Slither.io",
                 "GAME_DESCRIPTION": "Play against other people online! Can you become the longest player of the day?",
                 "EMBED_URL": "https://slither.io/",
@@ -275,7 +327,13 @@
                 "POPULAR": true
             },
             {
-                "GAME_ID": "krunker",
+                "GAME_NAME": "1v1.lol",
+                "GAME_DESCRIPTION": "A fast-paced building and shooting multiplayer game.",
+                "EMBED_URL": "https://1v1.lol/",
+                "IMAGE_URL": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": true
+            },
+            {
                 "GAME_NAME": "Krunker",
                 "GAME_DESCRIPTION": "A fast-paced pixelated first-person shooter.",
                 "EMBED_URL": "https://krunker.io/",
@@ -283,7 +341,6 @@
                 "POPULAR": false
             },
             {
-                "GAME_ID": "tetris",
                 "GAME_NAME": "Tetris",
                 "GAME_DESCRIPTION": "The classic block stacking puzzle game.",
                 "EMBED_URL": "https://tetris.com/play-tetris",
@@ -291,7 +348,6 @@
                 "POPULAR": false
             },
             {
-                "GAME_ID": "2048",
                 "GAME_NAME": "2048",
                 "GAME_DESCRIPTION": "Slide tiles to combine them and reach 2048.",
                 "EMBED_URL": "https://play2048.co/",
@@ -300,32 +356,25 @@
             }
         ];
 
-        // 1. Core Sorting & Filtering Logic
+        // Core Sorting & Filtering
         function getFilteredAndSortedGames() {
-            // Step A: Filter by Tab and Search Bar
             let filteredGames = allGames.filter(game => {
                 const matchesTab = currentTab === 'ALL' || (currentTab === 'POPULAR' && game.POPULAR === true);
                 const matchesSearch = game.GAME_NAME.toLowerCase().includes(searchQuery.toLowerCase());
                 return matchesTab && matchesSearch;
             });
 
-            // Step B: Sort the results
             return filteredGames.sort((a, b) => {
-                // Rule 1: Popular games always go to the top
                 if (a.POPULAR && !b.POPULAR) return -1;
                 if (!a.POPULAR && b.POPULAR) return 1;
-                
-                // Rule 2: Alphabetical sort (A-Z), making sure numbers come first.
-                // localeCompare with numeric:true is the industry standard way to naturally sort numbers before letters.
                 return a.GAME_NAME.localeCompare(b.GAME_NAME, undefined, { numeric: true, sensitivity: 'base' });
             });
         }
 
-        // 2. Render the Grid
+        // Render the Grid
         function renderGrid() {
             const gridContainer = document.getElementById('grid-container');
             gridContainer.innerHTML = '';
-
             const gamesToDisplay = getFilteredAndSortedGames();
 
             if (gamesToDisplay.length === 0) {
@@ -336,43 +385,37 @@
             gamesToDisplay.forEach(game => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
-                card.onclick = () => openGame(game.GAME_ID);
+                card.onclick = () => openGame(game.GAME_NAME); // Opens game by name
 
-                // Add a star next to the title if it's popular
                 const popularIcon = game.POPULAR ? '<span class="popular-badge">⭐</span>' : '';
-
                 card.innerHTML = `
                     <img class="game-thumbnail" src="${game.IMAGE_URL}" alt="${game.GAME_NAME}">
                     <div class="game-info">
                         <h3>${game.GAME_NAME} ${popularIcon}</h3>
                     </div>
                 `;
-                
                 gridContainer.appendChild(card);
             });
         }
 
-        // 3. Handle Tab Clicking
+        // Tab Clicking
         function setTab(tabName) {
             currentTab = tabName;
-            
-            // Update UI styles for tabs
             document.getElementById('tab-ALL').classList.remove('active');
             document.getElementById('tab-POPULAR').classList.remove('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
-
             renderGrid();
         }
 
-        // 4. Handle Search Input
+        // Search Input
         function handleSearch() {
             searchQuery = document.getElementById('search-bar').value;
             renderGrid();
         }
 
-        // 5. Handle Playing a Game
-        function openGame(id) {
-            const game = allGames.find(g => g.GAME_ID === id);
+        // Handle Playing a Game (Now uses GAME_NAME instead of ID)
+        function openGame(gameName) {
+            const game = allGames.find(g => g.GAME_NAME === gameName);
             if (game) {
                 document.getElementById('player-title').innerText = game.GAME_NAME;
                 document.getElementById('player-desc').innerText = game.GAME_DESCRIPTION;
@@ -380,17 +423,39 @@
 
                 document.getElementById('home-view').style.display = 'none';
                 document.getElementById('game-view').style.display = 'block';
-                document.body.style.backgroundColor = '#111111';
                 window.scrollTo(0, 0);
             }
         }
 
-        // 6. Handle Returning to Menu
+        // Handle Returning to Menu
         function goBackToMenu() {
             document.getElementById('player-frame').src = ""; 
             document.getElementById('game-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
-            document.body.style.backgroundColor = '#f4f6f8';
+        }
+
+        // --- NEW FEATURE: Fullscreen ---
+        function openFullscreen() {
+            const iframe = document.getElementById('player-frame');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) { /* Safari */
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) { /* IE11 */
+                iframe.msRequestFullscreen();
+            }
+        }
+
+        // --- NEW FEATURE: Dark/Light Mode Toggle ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const themeBtn = document.getElementById('theme-btn');
+            
+            if (document.body.classList.contains('light-mode')) {
+                themeBtn.innerText = '🌙';
+            } else {
+                themeBtn.innerText = '☀️';
+            }
         }
 
         // Start up the grid!

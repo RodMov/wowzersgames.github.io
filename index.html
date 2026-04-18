@@ -19,16 +19,19 @@
             color: #2d3436;
         }
 
-        /* --- NAVIGATION BAR --- */
+        /* --- NAVIGATION & CONTROLS --- */
         nav {
             background-color: #ffffff;
             padding: 15px 40px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -39,17 +42,62 @@
             letter-spacing: 1px;
         }
 
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 2px solid transparent;
+            padding: 8px 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #636e72;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #ff4757;
+        }
+
+        .tab-btn.active {
+            background: #ffeaa7;
+            color: #d63031;
+            border-color: #fdcb6e;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #search-bar {
+            padding: 10px 20px;
+            border: 2px solid #dfe6e9;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.2s, width 0.3s;
+        }
+
+        #search-bar:focus {
+            border-color: #ff4757;
+            width: 300px;
+        }
+
         /* --- HOMEPAGE GRID STYLES --- */
         #home-view {
             max-width: 1400px;
             margin: 0 auto;
             padding: 30px;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #2d3436;
         }
 
         .game-grid {
@@ -58,12 +106,21 @@
             gap: 25px;
         }
 
+        /* Shows when search finds nothing */
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            font-size: 1.2rem;
+            color: #636e72;
+            padding: 40px;
+        }
+
         .game-card {
             position: relative;
             background: #fff;
             border-radius: 20px;
             cursor: pointer;
-            overflow: hidden; /* Keeps the zooming image inside the rounded borders */
+            overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
         }
@@ -75,14 +132,14 @@
 
         .game-thumbnail {
             width: 100%;
-            aspect-ratio: 1 / 1; /* Forces the perfect square layout */
+            aspect-ratio: 1 / 1;
             object-fit: cover;
             transition: transform 0.4s ease;
             display: block;
         }
 
         .game-card:hover .game-thumbnail {
-            transform: scale(1.1); /* Zooms the image slightly on hover */
+            transform: scale(1.1);
         }
 
         .game-info {
@@ -100,12 +157,21 @@
             font-size: 1.2rem;
             font-weight: 600;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        /* --- GAME PLAYER STYLES (Cinematic Mode) --- */
+        /* The little star icon for popular games */
+        .popular-badge {
+            color: #fdcb6e;
+            font-size: 1.2rem;
+        }
+
+        /* --- GAME PLAYER STYLES --- */
         #game-view {
             display: none;
-            background-color: #111111; /* Dark background for playing games */
+            background-color: #111111;
             min-height: 100vh;
             padding: 20px;
         }
@@ -130,9 +196,6 @@
             cursor: pointer;
             font-weight: 600;
             transition: background 0.2s, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .back-btn:hover {
@@ -167,71 +230,128 @@
 <body>
 
     <nav>
-        <div class="logo">🎮 Wowzers Games</div>
+        <div class="logo">🎮 Wowzers</div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setTab('ALL')" id="tab-ALL">All Games</button>
+            <button class="tab-btn" onclick="setTab('POPULAR')" id="tab-POPULAR">⭐ Popular</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search games..." oninput="handleSearch()">
+        </div>
     </nav>
 
     <div id="home-view">
-        <h2 class="section-title">Trending Now</h2>
         <div class="game-grid" id="grid-container">
             </div>
     </div>
 
     <div id="game-view">
         <div class="player-header">
-            <button class="back-btn" onclick="goBackToMenu()">
-                <span>←</span> Back
-            </button>
+            <button class="back-btn" onclick="goBackToMenu()">← Back</button>
             <h2 id="player-title">Loading...</h2>
         </div>
-        
         <div class="game-frame-container">
             <iframe id="player-frame" class="game-frame" src="" allowfullscreen></iframe>
         </div>
-        
         <p id="player-desc" class="player-desc"></p>
     </div>
 
     <script>
-        // Your database of games
+        // Data State Variables
+        let currentTab = 'ALL'; // 'ALL' or 'POPULAR'
+        let searchQuery = '';
+
+        // Added "POPULAR" properties and some number-based games
         const allGames = [
             {
                 "GAME_ID": "slither",
                 "GAME_NAME": "Slither.io",
                 "GAME_DESCRIPTION": "Play against other people online! Can you become the longest player of the day?",
                 "EMBED_URL": "https://slither.io/",
-                "IMAGE_URL": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800"
+                "IMAGE_URL": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": true
+            },
+            {
+                "GAME_ID": "1v1lol",
+                "GAME_NAME": "1v1.lol",
+                "GAME_DESCRIPTION": "A fast-paced building and shooting multiplayer game.",
+                "EMBED_URL": "https://1v1.lol/",
+                "IMAGE_URL": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": true
             },
             {
                 "GAME_ID": "krunker",
                 "GAME_NAME": "Krunker",
                 "GAME_DESCRIPTION": "A fast-paced pixelated first-person shooter.",
                 "EMBED_URL": "https://krunker.io/",
-                "IMAGE_URL": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800"
+                "IMAGE_URL": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": false
             },
             {
                 "GAME_ID": "tetris",
                 "GAME_NAME": "Tetris",
                 "GAME_DESCRIPTION": "The classic block stacking puzzle game.",
                 "EMBED_URL": "https://tetris.com/play-tetris",
-                "IMAGE_URL": "https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&q=80&w=800"
+                "IMAGE_URL": "https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": false
+            },
+            {
+                "GAME_ID": "2048",
+                "GAME_NAME": "2048",
+                "GAME_DESCRIPTION": "Slide tiles to combine them and reach 2048.",
+                "EMBED_URL": "https://play2048.co/",
+                "IMAGE_URL": "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&q=80&w=800",
+                "POPULAR": false
             }
         ];
 
-        // Build the grid
-        function buildGrid() {
+        // 1. Core Sorting & Filtering Logic
+        function getFilteredAndSortedGames() {
+            // Step A: Filter by Tab and Search Bar
+            let filteredGames = allGames.filter(game => {
+                const matchesTab = currentTab === 'ALL' || (currentTab === 'POPULAR' && game.POPULAR === true);
+                const matchesSearch = game.GAME_NAME.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesTab && matchesSearch;
+            });
+
+            // Step B: Sort the results
+            return filteredGames.sort((a, b) => {
+                // Rule 1: Popular games always go to the top
+                if (a.POPULAR && !b.POPULAR) return -1;
+                if (!a.POPULAR && b.POPULAR) return 1;
+                
+                // Rule 2: Alphabetical sort (A-Z), making sure numbers come first.
+                // localeCompare with numeric:true is the industry standard way to naturally sort numbers before letters.
+                return a.GAME_NAME.localeCompare(b.GAME_NAME, undefined, { numeric: true, sensitivity: 'base' });
+            });
+        }
+
+        // 2. Render the Grid
+        function renderGrid() {
             const gridContainer = document.getElementById('grid-container');
             gridContainer.innerHTML = '';
 
-            allGames.forEach(game => {
+            const gamesToDisplay = getFilteredAndSortedGames();
+
+            if (gamesToDisplay.length === 0) {
+                gridContainer.innerHTML = '<div class="no-results">No games found. Try searching for something else!</div>';
+                return;
+            }
+
+            gamesToDisplay.forEach(game => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
                 card.onclick = () => openGame(game.GAME_ID);
 
-                // Replaced the simple layout with a layered app-style layout
+                // Add a star next to the title if it's popular
+                const popularIcon = game.POPULAR ? '<span class="popular-badge">⭐</span>' : '';
+
                 card.innerHTML = `
                     <img class="game-thumbnail" src="${game.IMAGE_URL}" alt="${game.GAME_NAME}">
                     <div class="game-info">
-                        <h3>${game.GAME_NAME}</h3>
+                        <h3>${game.GAME_NAME} ${popularIcon}</h3>
                     </div>
                 `;
                 
@@ -239,10 +359,27 @@
             });
         }
 
-        // Handle opening a game
+        // 3. Handle Tab Clicking
+        function setTab(tabName) {
+            currentTab = tabName;
+            
+            // Update UI styles for tabs
+            document.getElementById('tab-ALL').classList.remove('active');
+            document.getElementById('tab-POPULAR').classList.remove('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            renderGrid();
+        }
+
+        // 4. Handle Search Input
+        function handleSearch() {
+            searchQuery = document.getElementById('search-bar').value;
+            renderGrid();
+        }
+
+        // 5. Handle Playing a Game
         function openGame(id) {
             const game = allGames.find(g => g.GAME_ID === id);
-            
             if (game) {
                 document.getElementById('player-title').innerText = game.GAME_NAME;
                 document.getElementById('player-desc').innerText = game.GAME_DESCRIPTION;
@@ -250,26 +387,21 @@
 
                 document.getElementById('home-view').style.display = 'none';
                 document.getElementById('game-view').style.display = 'block';
-                
-                // Switch body background color so it looks like a whole different page
                 document.body.style.backgroundColor = '#111111';
-                window.scrollTo(0, 0); // Scroll to top
+                window.scrollTo(0, 0);
             }
         }
 
-        // Handle going back to the menu
+        // 6. Handle Returning to Menu
         function goBackToMenu() {
             document.getElementById('player-frame').src = ""; 
             document.getElementById('game-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
-            
-            // Reset background color back to light mode
             document.body.style.backgroundColor = '#f4f6f8';
         }
 
-        // Start everything up
-        buildGrid();
+        // Start up the grid!
+        renderGrid();
     </script>
-
 </body>
 </html>
